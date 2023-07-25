@@ -5,7 +5,7 @@ const User = require("../models/User");
 const register = async (req, res) => {
   try {
     const {
-      firstname,
+      firstName,
       lastName,
       email,
       password,
@@ -15,11 +15,18 @@ const register = async (req, res) => {
       occupation,
     } = req.body;
 
+    // Validate that the firstname field is present and not empty
+    if (!firstName) {
+      return res.status(400).json({ error: 'First name is required.' });
+    }
+
+    console.log(req.body);
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-        firstname,
+      firstName,
         lastName,
         email,
         password: hashedPassword,

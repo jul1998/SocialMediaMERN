@@ -8,10 +8,21 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
 
+const User = require('./models/User');
+const Post = require('./models/Post');
+const {users, posts} = require('./data');
+
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
+const postRoutes = require('./routes/posts');
+
+
 const {register} = require('./controllers/auth');
+const {createPost} = require('./controllers/posts');
+
+
+const { verifyToken } = require('./middleware/auth');
 
 // Configuration middleware
 dotenv.config();
@@ -38,11 +49,14 @@ const storage = multer.diskStorage({
   
   /* ROUTES WITH FILES */
   app.post("/auth/register", upload.single("picture"), register);
+  app.post("/posts", verifyToken, upload.single("picture"), createPost);
 
 
 //Routes
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
+app.use('/posts', postRoutes)
+
 
 /* mongoose setup*/
 
@@ -53,4 +67,15 @@ mongoose.connect(process.env.MONGO_URL, {
 }).then(() => {
   app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
   console.log('Connected to MongoDB');
+
+  User.insertMany(users).then((res) => {
+    console.log('Users added to database');
+  }
+  ).catch((error) => console.log(error.message));
+
+ /* Post.insertMany(posts).then((res) => {
+    console.log('Posts added to database');
+  }
+  ).catch((error) => console.log(error.message));*/
+
 }).catch((error) => console.log(error.message));

@@ -51,7 +51,10 @@ const User = require("../models/User");
 
 const addRemoveFriend = async (req, res) => {
   try {
-    const { id, friendId } = req.params;
+    //get data from body
+
+    const { friendId, id } = req.body;
+    console.log(id, friendId);
 
     const user = await User.findById(id);
     const friend = await User.findById(friendId);
